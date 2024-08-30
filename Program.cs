@@ -47,12 +47,13 @@ public class Program
         // should contain single public class with dynamic injections param and public method 'Process' without params
         string codeToCompile = @"
             using System;
+            using System.Threading.Tasks;
 
             public class ScriptProcessor(dynamic injections)
             {
-                public void Process()
+                public async Task Process()
                 {
-                    injections.TestClass.Write1(injections.Message);
+                    await injections.TestClass.Write1(injections.Message);
                     injections.TestClass.Write2(injections.OtherClass, injections.SomeType);
                     injections.SomeMethod(""Passed"");
                 }
@@ -65,6 +66,7 @@ public class Program
             typeof(Enumerable).GetTypeInfo().Assembly.Location,
             typeof(DynamicObject).Assembly.Location,
             typeof(RuntimeBinderException).Assembly.Location,
+            typeof(Task).Assembly.Location,
             Path.Combine(Path.GetDirectoryName(typeof(object).GetTypeInfo().Assembly.Location)!, "System.Runtime.dll")
         };
         var references = refPaths.Select(r => MetadataReference.CreateFromFile(r));
