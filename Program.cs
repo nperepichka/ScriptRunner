@@ -54,6 +54,7 @@ public class Program
                 {
                     injections.TestClass.Write1(injections.Message);
                     injections.TestClass.Write2(injections.OtherClass, injections.SomeType);
+                    injections.SomeMethod(""Passed"");
                 }
             }
             ";
@@ -99,6 +100,7 @@ public class Program
                 injections.SomeType = typeof(string);
                 injections.TestClass = new TestClass();
                 injections.OtherClass = new OtherClass() as object;
+                injections.SomeMethod = (Action<string>)SomeAction;
 
                 var instance = assembly.CreateInstance(type.Name, false, BindingFlags.Public | BindingFlags.Instance, null, [injections], null, null);
                 var method = type.GetMethod("Process", BindingFlags.Public | BindingFlags.Instance)!;
@@ -115,5 +117,10 @@ public class Program
                 }
             }
         }
+    }
+
+    private static void SomeAction(string message)
+    {
+        Console.WriteLine($"Message: '{message}'");
     }
 }
