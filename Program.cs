@@ -42,7 +42,7 @@ public class OtherClass
 
 public class Program
 {
-    public static void Main()
+    public static async Task Main()
     {
         // should contain single public class with dynamic injections param and public method 'Process' without params
         string codeToCompile = @"
@@ -69,6 +69,7 @@ public class Program
             typeof(Task).Assembly.Location,
             Path.Combine(Path.GetDirectoryName(typeof(object).GetTypeInfo().Assembly.Location)!, "System.Runtime.dll")
         };
+
         var references = refPaths.Select(r => MetadataReference.CreateFromFile(r));
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
         var syntaxTree = CSharpSyntaxTree.ParseText(codeToCompile);
@@ -106,7 +107,10 @@ public class Program
 
                 var instance = assembly.CreateInstance(type.Name, false, BindingFlags.Public | BindingFlags.Instance, null, [injections], null, null);
                 var method = type.GetMethod("Process", BindingFlags.Public | BindingFlags.Instance)!;
-                method.Invoke(instance, null);
+                var res = method.Invoke(instance, null);
+
+                if (res is Task asyncRes)
+                    await asyncRes;
             }
             catch (Exception ex)
             {
